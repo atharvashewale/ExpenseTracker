@@ -1,9 +1,11 @@
+import { Pencil, Trash2 } from "lucide-react";
+
 function ExpenseItem({
   expense,
   onDelete,
   onEdit,
 }) {
-  const { label, amount, date, id } = expense;
+  const { label, amount, date, _id } = expense;
 
   const formattedDate = new Date(date).toLocaleDateString(
     "en-IN",
@@ -13,8 +15,18 @@ function ExpenseItem({
     }
   );
 
+  const handleDelete = (expenseId) => {
+    const confirmed = window.confirm(
+      "Delete this expense?"
+    );
+
+    if (confirmed) {
+      onDelete(expenseId);
+    }
+  };
+
   return (
-    <div className="flex justify-between items-center bg-white p-3 rounded-lg shadow">
+    <div key={expense._id} className="flex justify-between items-center bg-white p-3 rounded-lg shadow">
         <div>
             <p className="font-medium">{label}</p>
 
@@ -34,19 +46,21 @@ function ExpenseItem({
       <div className="flex items-center gap-3">
         <p className="font-semibold">₹{amount}</p>
 
-        <button
-          onClick={() => onEdit(expense)}
-          className="text-sm text-blue-500"
-        >
-          Edit
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => onEdit(expense)}
+            className="p-2 rounded-full hover:bg-gray-100"
+          >
+            <Pencil size={18} className="text-gray-600" />
+          </button>
 
-        <button
-          onClick={() => onDelete(id)}
-          className="text-sm text-red-500"
-        >
-          Delete
-        </button>
+          <button
+            onClick={() => handleDelete(expense._id)}
+            className="p-2 rounded-full hover:bg-red-50"
+          >
+            <Trash2 size={18} className="text-red-500" />
+          </button>
+        </div>
       </div>
     </div>
   );

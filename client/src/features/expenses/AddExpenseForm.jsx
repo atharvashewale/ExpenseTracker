@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react";
-import { getMonthKey, getNextMonthKey, formatMonthLabel } from "../../utils/date";
+import { getMonthKey, getNextMonthKey, formatMonthLabel, formatDateInputValue } from "../../utils/date";
 
 function AddExpenseForm({ isOpen, onAddExpense, onUpdateExpense, editingExpense, onClose }) {
-    const today = new Date().toISOString().split("T")[0];
-
-    const todayDate = new Date();
-    const currentCycle = getMonthKey(todayDate);
+    const today = formatDateInputValue();
 
     const getDefaultFormState = (dateValue = today) => ({
         label: "",
@@ -19,9 +16,8 @@ function AddExpenseForm({ isOpen, onAddExpense, onUpdateExpense, editingExpense,
         getDefaultFormState()
     );
 
-    const selectedDate = new Date(formData.date);
-    const currentCycleOption = getMonthKey(selectedDate);
-    const nextCycleOption = getNextMonthKey(selectedDate);
+    const currentCycleOption = getMonthKey(formData.date);
+    const nextCycleOption = getNextMonthKey(formData.date);
 
     const [error, setError] = useState("");
 
@@ -59,9 +55,6 @@ function AddExpenseForm({ isOpen, onAddExpense, onUpdateExpense, editingExpense,
         }
 
         const expensePayload = {
-            id: editingExpense
-            ? editingExpense.id
-            : Date.now(),
             label,
             amount,
             date: formData.date,
@@ -70,16 +63,12 @@ function AddExpenseForm({ isOpen, onAddExpense, onUpdateExpense, editingExpense,
         };
 
         if (editingExpense) {
-            onUpdateExpense(expensePayload);
+            onUpdateExpense(expensePayload, editingExpense ? editingExpense._id: Date.now());
         } else {
             onAddExpense(expensePayload);
         }
 
-        setFormData({
-            label: "",
-            amount: "",
-            date: today,
-        });
+        setFormData(getDefaultFormState());
 
         setError("");
         onClose();
@@ -92,9 +81,7 @@ function AddExpenseForm({ isOpen, onAddExpense, onUpdateExpense, editingExpense,
             setFormData({
             label: editingExpense.label,
             amount: editingExpense.amount,
-            date: new Date(editingExpense.date)
-                .toISOString()
-                .split("T")[0],
+            date: formatDateInputValue(editingExpense.date),
             paymentMode:
                 editingExpense.paymentMode || "cash",
             cycleMonth:

@@ -9,23 +9,23 @@ import AddExpenseForm from './features/expenses/AddExpenseForm';
 import { getStoredExpenses, saveExpenses } from './utils/storage';
 import MonthFilter from './features/expenses/MonthFilter';
 import BottomSheet from './components/BottomSheet';
-import { getMonthKey, formatMonthLabel } from './utils/date';
+import { fetchExpenses, createExpense, updateExpense, deleteExpense } from './services/expenseApi';
 
 const defaultExpenses = [
   {
-    id: 1,
+    _id: 1,
     label: "Dinner",
     amount: 800,
     date: "2026-03-25",
   },
   {
-    id: 2,
+    _id: 2,
     label: "Fuel",
     amount: 1200,
     date: "2026-03-26",
   },
   {
-    id: 3,
+    _id: 3,
     label: "Groceries",
     amount: 1500,
     date: "2026-03-27",
@@ -55,29 +55,54 @@ function App() {
   
   const [isFormOpen, setIsFormOpen] = useState(false);
   
-  const handleAddExpense = (expense) => {
-    setExpenses((prevExpenses) => [expense, ...prevExpenses]);
+  const handleAddExpense = async (newExpense) => {
+    try {
+      const savedExpense =
+        await createExpense(newExpense);
+
+      setExpenses((prev) => [
+        savedExpense,
+        ...prev,
+      ]);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleDeleteExpense = (expenseId) => {
-    setExpenses((prevExpenses) =>
-      prevExpenses.filter(
-        (expense) => expense.id !== expenseId
-      )
-    );
+  const handleDeleteExpense = async (expenseId) => {
+    try {
+      await deleteExpense(expenseId);
+
+      setExpenses((prev) =>
+        prev.filter(
+          (expense) =>
+            expense._id !== expenseId
+        )
+      );
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleUpdateExpense = (updatedExpense) => {
-    setExpenses((prevExpenses) =>
-      prevExpenses.map((expense) =>
-        expense.id === updatedExpense.id
-          ? updatedExpense
-          : expense
-      )
-    );
+  const handleUpdateExpense = async (updatedExpense, updatedExpenseId) => {
+    try {
+      const savedExpense =
+        await updateExpense(
+          updatedExpenseId,
+          updatedExpense
+        );
 
-    setEditingExpense(null);
-  };
+      setExpenses((prev) =>
+        prev.map((expense) =>
+          expense._id === savedExpense._id
+            ? savedExpense
+            : expense
+        )
+      );
+    } catch (error) {
+      console.error(error);
+    }
+};
 
   const filteredExpenses = expenses
   .filter((expense) => {
@@ -160,8 +185,17 @@ const previousCycleTotal = previousCycleMonth
   const dashboardPreviousCycleTotal = isLatestMonthView ? previousCycleTotal : 0;
 
   useEffect(() => {
-    saveExpenses(expenses);
-  }, [expenses]);
+    const loadExpenses = async () => {
+      try {
+        const data = await fetchExpenses();
+        setExpenses(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    loadExpenses();
+  }, []);
 
   useEffect(() => {
     document.body.style.overflow = isFormOpen
