@@ -4,7 +4,7 @@ const API_BASE_URL =
 
 export const fetchExpenses = async () => {
   const response = await fetch(
-    `${API_BASE_URL}/expenses`
+    `${API_BASE_URL}/api/expenses`
   );
 
   if (!response.ok) {
@@ -20,7 +20,7 @@ export const createExpense = async (
   expense
 ) => {
   const response = await fetch(
-    `${API_BASE_URL}/expenses`,
+    `${API_BASE_URL}/api/expenses`,
     {
       method: "POST",
       headers: {
@@ -44,7 +44,7 @@ export const updateExpense = async (
   expense
 ) => {
   const response = await fetch(
-    `${API_BASE_URL}/expenses/${_id}`,
+    `${API_BASE_URL}/api/expenses/${_id}`,
     {
       method: "PUT",
       headers: {
@@ -65,7 +65,7 @@ export const updateExpense = async (
 
 export const deleteExpense = async (_id) => {
   const response = await fetch(
-    `${API_BASE_URL}/expenses/${_id}`,
+    `${API_BASE_URL}/api/expenses/${_id}`,
     {
       method: "DELETE",
     }
