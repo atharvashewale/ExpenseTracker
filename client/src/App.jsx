@@ -109,10 +109,17 @@ function App() {
     const expenseMonth = new Date(expense.date).getMonth();
     return expenseMonth === selectedMonth;
   })
-  .sort((a, b) =>
-      new Date(b.date).getTime() -
-      new Date(a.date).getTime()
-  );
+  .sort((a, b) => {
+      const dateDiff =
+      new Date(b.date) - new Date(a.date);
+
+      if (dateDiff !== 0) return dateDiff;
+
+      return (
+        new Date(b.createdAt) -
+        new Date(a.createdAt)
+      );
+  });
 
   const allCreditExpenses = expenses.filter(
     (expense) =>

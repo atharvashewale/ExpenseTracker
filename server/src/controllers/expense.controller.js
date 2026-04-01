@@ -3,7 +3,8 @@ import Expense from "../models/expense.model.js";
 export const getExpenses = async (_req, res) => {
   try {
     const expenses = await Expense.find().sort({
-      date: -1,
+        date: -1,
+        createdAt: -1
     });
 
     res.json(expenses);
